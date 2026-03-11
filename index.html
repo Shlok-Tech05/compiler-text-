@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Compiler v1.0 — IDE</title>
+  <meta name="description" content="Text Compiler v1.0 – A lightweight code editor and compiler tool." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="topbar-left" id="nav-home-btn" title="Go Home" style="cursor:pointer;">
+      <div class="app-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+      </div>
+      <span class="app-title">Text Compiler</span>
+      <span class="app-version">v1.0</span>
+    </div>
+
+    <div class="topbar-tabs" id="topbar-tabs">
+      <div class="tab" id="tab-home" data-view="home">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        home
+      </div>
+      <div class="tab" id="tab-share" data-view="share">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+        </svg>
+        share_text.txt
+      </div>
+      <div class="tab" id="tab-load" data-view="load">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        load_text.txt
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <!-- hamburger (mobile only) -->
+      <button class="icon-btn hamburger-btn" id="hamburger-btn" title="Explorer" aria-label="Toggle sidebar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="run-btn" title="Run">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="5 3 19 12 5 21 5 3" />
+        </svg>
+        <span class="run-label">Run</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">EXPLORER</div>
+        <div class="sidebar-item" id="sb-home" data-view="home">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          </svg>
+          home.txt
+        </div>
+        <div class="sidebar-item" id="sb-share" data-view="share">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          share_text.txt
+        </div>
+        <div class="sidebar-item" id="sb-load" data-view="load">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          load_text.txt
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">OUTLINE</div>
+        <div class="sidebar-item dim">shareModule()</div>
+        <div class="sidebar-item dim">loadModule()</div>
+        <div class="sidebar-item dim">utils</div>
+      </div>
+    </aside>
+
+    <!-- Sidebar overlay (mobile tap-to-close) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- ===== MAIN AREA ===== -->
+    <main class="editor-area">
+
+      <!-- ══════════════════════════════════════
+           VIEW: HOME
+      ══════════════════════════════════════ -->
+      <div class="view" id="view-home">
+        <div class="home-container">
+
+          <!-- Fake editor header bar -->
+          <div class="home-editor-bar">
+            <span class="home-file-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              home.txt
+            </span>
+            <span class="panel-lang">PLAINTEXT</span>
+          </div>
+
+          <!-- Editor-style welcome block -->
+          <div class="home-editor-body">
+            <div class="home-line-col">
+              <span>1</span><span>2</span><span>3</span><span>4</span>
+              <span>5</span><span>6</span><span>7</span><span>8</span>
+              <span>9</span><span>10</span><span>11</span><span>12</span>
+            </div>
+            <div class="home-code-col">
+              <p class="hc-comment">// ─────────────────────────────────────</p>
+              <p class="hc-comment">// Text Compiler v1.0</p>
+              <p class="hc-comment">// Lightweight IDE-style sharing tool</p>
+              <p class="hc-comment">// ─────────────────────────────────────</p>
+              <p>&nbsp;</p>
+              <p><span class="hc-kw">const</span> mode <span class="hc-op">=</span> <span class="hc-str">await</span>
+                selectMode<span class="hc-op">();</span></p>
+              <p>&nbsp;</p>
+              <p class="hc-comment">// Choose an action below:</p>
+              <p>&nbsp;</p>
+              <p><span class="hc-kw">if</span> <span class="hc-op">(</span>mode <span class="hc-op">===</span> <span
+                  class="hc-str">"share"</span><span class="hc-op">)</span> <span class="hc-op">&#123;</span> <span
+                  class="hc-comment">// paste &amp; get a code</span></p>
+              <p><span class="hc-kw">if</span> <span class="hc-op">(</span>mode <span class="hc-op">===</span> <span
+                  class="hc-str">"load"</span><span class="hc-op">)</span> <span class="hc-op">&#123;</span> <span
+                  class="hc-comment">// enter code &amp; read text</span></p>
+              <p>&nbsp;</p>
+            </div>
+          </div>
+
+          <!-- The two big action cards -->
+          <div class="home-cards">
+
+            <button class="home-card card-share" id="home-share-btn">
+              <div class="card-icon-wrap card-icon-blue">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+              </div>
+              <div class="card-text">
+                <span class="card-title">Share Text</span>
+                <span class="card-sub">Paste text → get a 6-digit code</span>
+              </div>
+              <div class="card-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </div>
+            </button>
+
+            <button class="home-card card-load" id="home-load-btn">
+              <div class="card-icon-wrap card-icon-green">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </div>
+              <div class="card-text">
+                <span class="card-title">Load Text</span>
+                <span class="card-sub">Enter a code → view shared text</span>
+              </div>
+              <div class="card-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </div>
+            </button>
+
+          </div><!-- .home-cards -->
+
+          <p class="home-hint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Data stored in browser memory only — cleared on refresh
+          </p>
+
+        </div>
+      </div><!-- #view-home -->
+
+
+      <!-- ══════════════════════════════════════
+           VIEW: SHARE
+      ══════════════════════════════════════ -->
+      <div class="view" id="view-share" style="display:none;">
+        <div class="view-header">
+          <button class="back-btn" data-view="home">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Back
+          </button>
+          <span class="view-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            share_text.txt
+          </span>
+          <span class="panel-lang">PLAINTEXT</span>
+        </div>
+
+        <div class="editor-wrapper">
+          <div class="line-numbers" id="share-lines"><span>1</span></div>
+          <div class="editor-inner">
+            <pre class="highlight-layer" id="share-highlight" aria-hidden="true"></pre>
+            <textarea id="share-input" class="code-editor"
+              placeholder="// Paste your text here...&#10;// e.g. notes, answers, messages" spellcheck="false"
+              autocomplete="off"></textarea>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-primary" id="generate-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Generate Code
+          </button>
+          <button class="btn btn-secondary" id="clear-share-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14H6L5 6" />
+            </svg>
+            Clear
+          </button>
+        </div>
+
+        <div id="share-error" class="error-msg" style="display:none; margin-top:10px; padding:0 15px;"></div>
+
+        <div class="code-output" id="code-output" style="display:none;">
+          <div class="output-row">
+            <span class="output-label">// Share Code:</span>
+            <div class="code-display" id="code-display">——</div>
+            <button class="copy-mini-btn" id="copy-code-btn" title="Copy Code">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          </div>
+          <div class="output-row">
+            <span class="output-label">// Share Link:</span>
+            <div class="link-display" id="link-display">——</div>
+            <button class="copy-mini-btn" id="copy-link-btn" title="Copy Link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          </div>
+          <div class="output-note">⚠ Code expires when tab is closed</div>
+        </div>
+      </div><!-- #view-share -->
+
+
+      <!-- ══════════════════════════════════════
+           VIEW: LOAD
+      ══════════════════════════════════════ -->
+      <div class="view" id="view-load" style="display:none;">
+        <div class="view-header">
+          <button class="back-btn" data-view="home">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Back
+          </button>
+          <span class="view-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            load_text.txt
+          </span>
+          <span class="panel-lang">PLAINTEXT</span>
+        </div>
+
+        <div class="load-input-area">
+          <div class="inline-input-row">
+            <label class="inline-label">// Enter Code:</label>
+            <input type="text" id="code-input" class="code-inline-input" placeholder="e.g. A7F2D9" maxlength="6"
+              autocomplete="off" spellcheck="false" />
+            <button class="btn btn-primary btn-sm" id="load-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              Load Text
+            </button>
+          </div>
+          <div class="error-msg" id="load-error" style="display:none;"></div>
+        </div>
+
+        <div class="editor-wrapper">
+          <div class="line-numbers" id="output-lines"><span>1</span></div>
+          <div class="editor-inner">
+            <pre class="highlight-layer" id="output-highlight" aria-hidden="true"></pre>
+            <textarea id="output-viewer" class="code-editor" placeholder="// Output will appear here after loading..."
+              readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-compile" id="compile-btn" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3" />
+            </svg>
+            Compile &amp; Run
+          </button>
+          <button class="btn btn-accent" id="copy-text-btn" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            Copy Text
+          </button>
+          <button class="btn btn-secondary" id="clear-output-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14H6L5 6" />
+            </svg>
+            Clear
+          </button>
+        </div>
+
+        <!-- ===== COMPILER OUTPUT PANEL ===== -->
+        <div class="compiler-panel collapsed" id="compiler-panel">
+          <div class="compiler-panel-header" id="compiler-panel-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+            <span class="compiler-panel-title">Terminal — Compiler Output</span>
+            <span class="compiler-lang-badge badge-plain" id="compiler-lang-badge">PLAINTEXT</span>
+            <button class="btn btn-sm btn-secondary" id="compiler-clear-btn" style="padding:2px 8px;font-size:11px;">Clear</button>
+            <span class="compiler-toggle">&#9650;</span>
+          </div>
+
+          <!-- stdin / program input area -->
+          <div class="stdin-area">
+            <div class="stdin-label">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/>
+              </svg>
+              stdin
+              <span class="stdin-hint">&nbsp;— one value per line (for input() / Scanner / scanf / cin)</span>
+            </div>
+            <textarea id="stdin-textarea" class="stdin-textarea"
+              placeholder="Enter program input here…&#10;e.g. 5&#10;hello world"
+              spellcheck="false" autocomplete="off" rows="2"></textarea>
+          </div>
+
+          <div class="compiler-body" id="compiler-body">
+            <span class="compiler-line cl-info">// Run &quot;Compile &amp; Run&quot; to execute loaded code</span>
+          </div>
+        </div>
+      </div><!-- #view-load -->
+
+      <!-- ===== STATUS BAR ===== -->
+      <footer class="statusbar">
+        <div class="statusbar-left">
+          <span class="status-segment status-ok" id="status-main">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="4" />
+            </svg>
+            Ready
+          </span>
+          <span class="status-segment" id="status-errors">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            0 Errors
+          </span>
+          <span class="status-segment" id="status-warnings">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            0 Warnings
+          </span>
+        </div>
+        <div class="statusbar-right">
+          <span class="status-segment" id="status-info">Text Loaded: None</span>
+          <span class="status-segment">UTF-8</span>
+          <span class="status-segment">Plain Text</span>
+          <span class="status-segment" id="status-time"></span>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <button class="mbn-btn" id="mbn-home" data-view="home">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Home</span>
+    </button>
+    <button class="mbn-btn" id="mbn-share" data-view="share">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      <span>Share</span>
+    </button>
+    <button class="mbn-btn" id="mbn-load" data-view="load">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span>Load</span>
+    </button>
+  </nav>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
